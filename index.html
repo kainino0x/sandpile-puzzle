@@ -1,0 +1,340 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>puzzle</title>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<style>
+.animated {
+}
+</style>
+<style>
+body {
+  background: #526684;
+  color: white;
+}
+input { padding: 1em; }
+
+#graph, #pieces, #svg, #labels {
+  user-select: none;
+  width: 580px;
+  height: 550px;
+}
+
+#graph {
+  position: relative;
+  margin: 55px 40px;
+}
+
+#labels {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.label {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  line-height: 35px;
+  font-size: 140%;
+  background: #322;
+  border-radius: 40px;
+  border: 5px solid transparent;
+  box-shadow: 0 0 6px #ffc;
+}
+
+.piece {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 20px;
+  background: black;
+  border: 1px solid #fdd;
+  box-shadow: 0 0 6px #fdd;
+}
+
+.v0  { left: calc(        290px - 9px); top: calc(550px - 336px - 9px); }
+.v5  { left: calc(        290px - 9px); top: calc(550px - 417px - 9px); }
+
+.v1  { left: calc(        357px - 9px); top: calc(550px - 287px - 9px); }
+.v2  { left: calc(        331px - 9px); top: calc(550px - 210px - 9px); }
+.v6  { left: calc(        433px - 9px); top: calc(550px - 312px - 9px); }
+.v7  { left: calc(        380px - 9px); top: calc(550px - 145px - 9px); }
+.v11 { left: calc(        510px - 9px); top: calc(550px - 398px - 9px); }
+.v12 { left: calc(        486px - 9px); top: calc(550px -  98px - 9px); }
+.v15 { left: calc(        350px - 9px); top: calc(550px - 517px - 9px); }
+.v16 { left: calc(        546px - 9px); top: calc(550px - 286px - 9px); }
+.v17 { left: calc(        388px - 9px); top: calc(550px -  27px - 9px); }
+
+.v4  { left: calc(580px - 357px - 9px); top: calc(550px - 287px - 9px); }
+.v3  { left: calc(580px - 331px - 9px); top: calc(550px - 210px - 9px); }
+.v9  { left: calc(580px - 433px - 9px); top: calc(550px - 312px - 9px); }
+.v8  { left: calc(580px - 380px - 9px); top: calc(550px - 145px - 9px); }
+.v19 { left: calc(580px - 510px - 9px); top: calc(550px - 398px - 9px); }
+.v18 { left: calc(580px - 486px - 9px); top: calc(550px -  98px - 9px); }
+.v10 { left: calc(580px - 350px - 9px); top: calc(550px - 517px - 9px); }
+.v14 { left: calc(580px - 546px - 9px); top: calc(550px - 286px - 9px); }
+.v13 { left: calc(580px - 388px - 9px); top: calc(550px -  27px - 9px); }
+
+.l0  {
+  left: calc(        290px - 23px); top: calc(550px - 336px - 21px);
+  background: black;
+  border: 5px solid black;
+  box-shadow: none;
+  color: rgba(0,0,0,0);
+}
+.l5  { left: calc(        290px - 23px); top: calc(550px - 418px - 23px); }
+
+.l1  { left: calc(        357px - 23px); top: calc(550px - 287px - 23px); }
+.l2  { left: calc(        331px - 23px); top: calc(550px - 210px - 23px); }
+.l6  { left: calc(        433px - 23px); top: calc(550px - 312px - 23px); }
+.l7  { left: calc(        378px - 23px); top: calc(550px - 144px - 23px); }
+.l11 { left: calc(        509px - 23px); top: calc(550px - 400px - 23px); }
+.l12 { left: calc(        486px - 23px); top: calc(550px -  98px - 23px); }
+.l15 { left: calc(        350px - 23px); top: calc(550px - 517px - 23px); }
+.l16 { left: calc(        546px - 23px); top: calc(550px - 286px - 23px); }
+.l17 { left: calc(        388px - 23px); top: calc(550px -  28px - 23px); }
+
+.l4  { left: calc(580px - 357px - 23px); top: calc(550px - 287px - 23px); }
+.l3  { left: calc(580px - 331px - 23px); top: calc(550px - 210px - 23px); }
+.l9  { left: calc(580px - 433px - 23px); top: calc(550px - 312px - 23px); }
+.l8  { left: calc(580px - 378px - 23px); top: calc(550px - 144px - 23px); }
+.l19 { left: calc(580px - 509px - 23px); top: calc(550px - 400px - 23px); }
+.l18 { left: calc(580px - 486px - 23px); top: calc(550px -  99px - 23px); }
+.l10 { left: calc(580px - 350px - 23px); top: calc(550px - 517px - 23px); }
+.l14 { left: calc(580px - 546px - 23px); top: calc(550px - 286px - 23px); }
+.l13 { left: calc(580px - 388px - 23px); top: calc(550px -  27px - 23px); }
+</style>
+</head>
+<body>
+
+<div id=graph>
+  <object id=svg type="image/svg+xml" data="puzzle_graph.svg"></object>
+  <div id=pieces></div>
+  <div id=labels>
+    <div id=l0  class="label l0"  onclick="clicknode(0)"></div>
+    <div id=l1  class="label l1"  onclick="clicknode(1)"></div>
+    <div id=l2  class="label l2"  onclick="clicknode(2)"></div>
+    <div id=l3  class="label l3"  onclick="clicknode(3)"></div>
+    <div id=l4  class="label l4"  onclick="clicknode(4)"></div>
+    <div id=l5  class="label l5"  onclick="clicknode(5)"></div>
+    <div id=l6  class="label l6"  onclick="clicknode(6)"></div>
+    <div id=l7  class="label l7"  onclick="clicknode(7)"></div>
+    <div id=l8  class="label l8"  onclick="clicknode(8)"></div>
+    <div id=l9  class="label l9"  onclick="clicknode(9)"></div>
+    <div id=l10 class="label l10" onclick="clicknode(10)"></div>
+    <div id=l11 class="label l11" onclick="clicknode(11)"></div>
+    <div id=l12 class="label l12" onclick="clicknode(12)"></div>
+    <div id=l13 class="label l13" onclick="clicknode(13)"></div>
+    <div id=l14 class="label l14" onclick="clicknode(14)"></div>
+    <div id=l15 class="label l15" onclick="clicknode(15)"></div>
+    <div id=l16 class="label l16" onclick="clicknode(16)"></div>
+    <div id=l17 class="label l17" onclick="clicknode(17)"></div>
+    <div id=l18 class="label l18" onclick="clicknode(18)"></div>
+    <div id=l19 class="label l19" onclick="clicknode(19)"></div>
+  </div>
+</div>
+<script>
+'use strict';
+
+let animationDuration;
+const setAnimationDuration = (sec) => {
+  animationDuration = sec;
+  document.styleSheets[0].cssRules[0].style.transition = `all ${sec}s linear`;
+};
+
+const animatePiece = (from, to) => {
+  if (animationDuration < 0.01) {
+    return Promise.resolve();
+  }
+  const p = $('<div>', {class: `animated piece v${from}`});
+  pieces.appendChild(p[0]);
+  return new Promise(res => {
+    setTimeout(() => {
+      pieces.removeChild(p[0]);
+      res();
+    }, animationDuration * 1000);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        p.removeClass(`v${from}`);
+        p.addClass(`v${to}`);
+      });
+    });
+  });
+};
+</script>
+
+<input type=button id=btnstart value='Restart'>
+<br>
+Animation duration: <input type=text size=4 id=txtspeed value=500>ms
+<br>
+<input type=button id=btnmultiply value=Multiply> by
+<input type=text size=4 id=txtmultiple value=2>
+
+<script>
+'use strict';
+
+const Graph = [
+  [5,4,1],
+  [6,0,2],
+  [7,1,3],
+  [8,2,4],
+  [9,3,0],
+  [0,10,15],
+  [1,11,16],
+  [2,12,17],
+  [3,13,18],
+  [4,14,19],
+  [5,14,11],
+  [6,10,12],
+  [7,11,13],
+  [8,12,14],
+  [9,13,10],
+  [5,19,16],
+  [6,15,17],
+  [7,16,18],
+  [8,17,19],
+  [9,18,15],
+];
+
+class State {
+  constructor(sink, graph) {
+    this.sink = sink;
+    this.graph = graph;
+    this.laststate = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    this.state     = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    this.showDiff = false;
+  }
+  snap() {
+    this.state[0] = 0;
+    this.laststate = this.state.slice();
+    this.showDiff = false;
+    this.render();
+  }
+  add(index) {
+    this.state[index] += 1;
+    $('#l' + index)[0].innerText = this.state[index];
+  }
+  multiply(multiple) {
+    for (let i = 1; i < this.state.length; ++i) {
+      this.state[i] *= multiple;
+    }
+    this.showDiff = true;
+  }
+  render() {
+    for (let i = 1; i < this.state.length; ++i) {
+      const el = $('#l' + i)[0];
+      if (this.showDiff) {
+        el.innerText = this.laststate[i] + '›' + this.state[i];
+        const diff = this.state[i] - this.laststate[i];
+        el.style.borderColor =
+          diff == 2 ? 'white transparent white transparent' :
+          diff == 1 ? 'transparent transparent white transparent' :
+          diff == 0 ? 'transparent' :
+          diff == -1 ? 'transparent white transparent transparent' :
+          diff == -2 ? 'transparent white transparent white' : '';
+      } else {
+        el.innerText = this.state[i];
+        el.style.borderColor = 'transparent';
+      }
+    }
+    this.state[0] = 0;
+    const stateString = '[[' + this.laststate.join(',') + '],[' + this.state.join(',') + '],' + this.showDiff + ']';
+    window.location.hash = stateString;
+    console.log(stateString);
+  }
+  async topple() {
+    const proms = [];
+    for (let i = 1; i < this.graph.length; ++i) {
+      const numNeighbors = this.graph[i].length;
+      if (i == this.sink) {
+        this.state[i] = 0;
+        continue;
+      }
+      if (this.state[i] >= numNeighbors) {
+        const elThis = $('#l' + i)[0];
+
+        this.state[i] -= this.graph[i].length;
+        elThis.innerText = this.state[i];
+
+        for (const neighbor of this.graph[i]) {
+          const prom = animatePiece(i, neighbor)
+            .then(() => {
+              this.state[neighbor] += 1;
+              const elNeighbor = $('#l' + neighbor)[0];
+              elNeighbor.innerText = this.state[neighbor];
+            });
+          proms.push(prom);
+        }
+      }
+    }
+    await Promise.all(proms);
+    return proms.length != 0;
+  }
+}
+
+let game;
+let busy = false;
+const load = () => {
+  [game.laststate, game.state, game.showDiff] = JSON.parse(decodeURI(window.location.hash.substring(1)));
+  game.render();
+};
+
+window.onhashchange = () => {
+  if (busy) {
+    return;
+  }
+  try {
+    load();
+  } catch (e) {
+    game.render();
+  }
+};
+window.onload = () => {
+  game = new State(0, Graph);
+  txtspeed.onchange();
+  window.onhashchange();
+}
+
+btnstart.onclick = () => {
+  game = new State(0, Graph);
+  game.render();
+};
+
+const resolve = async () => {
+  busy = true;
+  while (await game.topple()) {}
+  game.render();
+  busy = false;
+};
+
+const clicknode = async (n) => {
+  game.snap();
+  game.add(n);
+  await resolve();
+};
+btnmultiply.onclick = async () => {
+  const multiple = parseInt(txtmultiple.value.trim());
+  game.snap();
+  game.multiply(multiple);
+  await resolve();
+};
+
+txtspeed.onchange = () => {
+  const speed = parseFloat(txtspeed.value / 1000);
+  setAnimationDuration(speed);
+};
+</script>
+
+</body>
+</html>
